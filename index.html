@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+
+	table{
+		table-layout: fixed;
+		border-spacing: 0;
+		border: 1px solid black;
+	}
+	td, th{
+		border: 1px solid black;
+		padding: .5em;
+	}
+	</style>
+</head>
+<body>
+
+<script type="text/javascript" src="jquery-2.1.3.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+
+	$.getJSON('data.json', function(data){
+		console.log(data);
+
+		var rows = [];
+		var currentRow = 0,
+			appRow = 0,
+			jobRow = 0,
+			jobColSpan = 0,
+			appColSpan = 0;
+
+
+	
+		data.jobs.forEach(function(job, index, arr){
+			if(!rows[currentRow]) rows[currentRow] = {data:[]};
+			jobColSpan = 0;
+			jobRow = currentRow;
+			
+			rows[currentRow].data.push( job.name );
+
+
+			data.applicants.forEach(function(applicant, index, arr){
+				appColSpan = 0;
+				
+				if(applicant.job_id = job.id){
+					// jobColSpan ++;
+					
+
+					if(!rows[currentRow]) rows[currentRow]= {data: []};
+					appRow = currentRow;
+
+					rows[appRow].data.push(applicant.name);
+					rows[appRow].data.push(applicant.email);
+					rows[appRow].data.push(applicant.website);
+						
+
+
+					// applicant.skills = []
+					data.skills.forEach(function(skill, index){
+
+						
+
+						if(skill.applicant_id === applicant.id){
+							
+							jobColSpan ++;
+							appColSpan ++;
+
+							if(!rows[currentRow]) rows[currentRow] = {data: []};
+							
+							rows[currentRow].data.push(skill.name);
+							currentRow++
+
+						}
+
+					});
+
+					rows[appRow].data.push(applicant.cover_letter);
+					rows[appRow].col2 = appColSpan;
+
+				}
+				
+			});
+
+			rows[jobRow].col1 = jobColSpan;
+
+		});
+
+		console.log(rows);
+
+		var $table = $("<table> <th>Job</th><th>Name</th><th>Email</th><th>Website</th><th>Skills</th><th>Cover Letter</th> </table>");
+
+		$('body').append($table);
+
+		rows.forEach(function(row,i,arr){
+			var $tr = $("<tr></tr>");
+			console.log(row.data.length);
+			row.data.forEach(function(col, i, arr){
+
+				// console.log(col2);
+				$td = $("<td>"+col+"</td>");
+
+				if(row.data.length == 6 && i!= 0 && i!= 4){
+					$td.attr('rowspan', row.col2);
+				} else if(row.data.length == 6 && i== 0){
+					$td.attr('rowspan', row.col1);
+				} else if(row.data.length == 5 && i!= 3){
+					$td.attr('rowspan', row.col2);
+				}
+				$tr.append($td);
+
+			});	
+
+			$table.append($tr)
+		});
+
+
+	});
+
+});
+
+// ROW
+// job, name, email, website, skills, cover letter
+</script>
+</body>
+</html>
